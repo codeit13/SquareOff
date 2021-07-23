@@ -1,0 +1,31 @@
+:root {
+    --light-gray: #e8e8e8;
+    --gray: #919191;
+}
+
+body {
+    font-family: "Roboto", sans-serif;
+    background-color: #fafafa;
+}
+
+.font-weight-bold {
+    font-weight: bold;
+}
+
+.wrapper {
+    margin: 50px auto;
+    max-width: 600px;
+    width: calc(100% - 40px);
+}
+
+.bg-gray {
+    background-color: var(--light-gray);
+}
+
+.text-color {
+    color: #4194a2;
+}
+
+.btn-color {
+    background-color: #4194a2;
+}
