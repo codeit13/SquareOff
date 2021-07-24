@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Log;
 |
 */
 
-Route::get('/', function () {
+Route::get('/home', function () {
     return view('index');
 });
 
