@@ -128,6 +128,7 @@ $(document).ready(function () {
 
     $('#saveToDatabase').click((event) => {
         let name = $('#item-name').val();
+        let mrp = $('#item-mrp').val();
         let hasOptions = ($("input[type='radio'][name='radio-options']:checked").attr('id') == "hasOptions") ? true : false;
 
         let optionValues = [],
@@ -159,6 +160,7 @@ $(document).ready(function () {
 
         let data = {
             name: name,
+            mrp: mrp,
             hasOptions: hasOptions,
             options: optionValues,
             variants: variants,
@@ -172,11 +174,30 @@ $(document).ready(function () {
             url: "/saveOrder",
             data: data,
             success: function (data) {
-                console.log(data);
-                $('.toast').toast('show');
-                setTimeout(() => {
-                    $('.toast').toast('hide');
-                }, 2000);
+                let id = data['id'];
+                let formData = new FormData(document.querySelector('#order-data-form'));
+                formData.append('id', id);
+                formData.append('_token', $('meta[name="csrf-token"]').attr('content'))
+
+                    $.ajax({
+                        type:'POST',
+                        url: `/upload-images`,
+                        data: formData,
+                        contentType: false,
+                        processData: false,
+                        success: (response) => {
+                            if (response) {
+                                $('.toast').toast('show');
+                                setTimeout(() => {
+                                    $('.toast').toast('hide');
+                                }, 2000);
+                            }
+                        },
+                        error: function(response){
+                            console.log(response);
+                                $('#image-input-error').text(response.responseJSON.errors.file);
+                        }
+                    });
             }
         });
     });

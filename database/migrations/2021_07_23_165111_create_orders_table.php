@@ -16,9 +16,12 @@ class CreateOrdersTable extends Migration
         Schema::create('orders', function (Blueprint $table) {
             $table->increments('id')->unique();
             $table->string('name');
+            $table->integer('mrp');
             $table->boolean('hasOptions');
             $table->longText('options')->nullable();
             $table->longText('variants')->nullable();
+            $table->string('image_name')->nullable();
+            $table->string('image_path')->nullable();
             $table->timestamps();
         });
     }

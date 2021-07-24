@@ -7,24 +7,65 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
 class HomeController extends Controller
-{
+{   
+    public function storeImage(Request $request)
+    {
+        $id = $request->id;
+        $request->validate([
+          'file' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:500000',
+        ]);
+
+        if ($request->file('file')) {
+            $imagePath = $request->file('file');
+            $imageName = $imagePath->getClientOriginalName();
+
+            $path = $request->file('file')->storeAs('uploads', $imageName, 'public');
+        }
+
+        $imagePath = '/storage/'.$path;
+        Orders::updateImageData($id, $imageName, $imagePath);
+
+        return response()->json('Image uploaded successfully');
+    }
+
     public function admin(Request $request) 
-    {   $id = $request->route('id');
+    {   $rows = Orders::getOrders('__ALL__');
+
+        $orders = array();
+
+        foreach ($rows as $key => $row) {
+            array_push($orders, (array)$row);
+        }
         
-        return view('admin')->with('id', $id);
+        return view('admin')->with('orders', $orders);
+    }
+
+    public function orderEdit(Request $request) 
+    {   $id = $request->route('id');
+        $result = Orders::getImagePath($id);
+
+        $name = $result['name'];
+        $mrp = $result['mrp'];
+        $image_path = $result['image_path'];
+        
+        return view('order-edit')->with(compact('id', 'name', 'mrp', 'image_path'));
     }
 
     public static function saveOrder(Request $request)
     {
         $input = $request->all();
-        Orders::saveOrder([
+        $id = Orders::saveOrder([
             'name' => $request->name,
+            'mrp' => $request->mrp,
             'hasOptions' => $request->hasOptions,
             'options' => json_encode($request->options),
             'variants' => json_encode($request->variants),
         ]);
 
-        return response()->json(['success' => 'Your Order have been saved successfully.']);
+        return response()->json([
+            'success' => 'Your Order have been saved successfully.',
+            'id' => $id
+        ]);
     }
 
     public static function updateOrder(Request $request)
